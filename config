@@ -1,0 +1,163 @@
+[colors]
+;background = ${xrdb:color0:#222}
+background = #gg006d77
+background-alt = #444
+;foreground = ${xrdb:color7:#222}
+foreground = #ffddd2
+foreground-alt = #555
+primary = #edf6f9
+secondary = #e60053
+alert = #bd2c40
+[bar/daniel2]
+monitor = HDMI-1-1
+
+width = 100%
+height = 20
+radius = 0.0
+fixed-center = true
+
+background = ${colors.background}
+foreground = ${colors.foreground}
+
+line-size = 3
+line-color = #f00
+
+border-size = 0
+border-color = #00000000
+
+padding-left = 0
+padding-right = 2
+
+module-margin-left = 1
+module-margin-right = 1
+
+enable-ipc = true
+
+font-0 = fixed:pixelsize=10;1
+font-1 = unifont:fontformat=truetype:size=8:antialias=false;0
+font-2 = siji:pixelsize=10;1
+font-3 = FontAwesome5Free:style=Solid:size=10;1
+font-4 = FontAwesome5Free:style=Regular:size=10;1
+font-5 = FontAwesome5Brands:style=Regular:size=10;1
+
+modules-right =  btc bth sound ram space wttr battery
+modules-left = time
+modules-center = i3
+
+tray-position = right
+tray-padding = 2
+
+;scroll-up = i3wm-wsnext
+;scroll-down = i3wm-wsprev
+
+cursor-click = pointer
+
+
+[bar/daniel]
+monitor = ${env:MONITOR:}
+
+width = 100%
+height = 20
+radius = 0.0
+fixed-center = true
+
+background = ${colors.background}
+foreground = ${colors.foreground}
+
+line-size = 3
+line-color = #f00
+
+border-size = 0
+border-color = #00000000
+
+padding-left = 0
+padding-right = 2
+
+module-margin-left = 1
+module-margin-right = 1
+
+enable-ipc = true
+
+font-0 = fixed:pixelsize=10;1
+font-1 = unifont:fontformat=truetype:size=8:antialias=false;0
+font-2 = siji:pixelsize=10;1
+font-3 = FontAwesome5Free:style=Solid:size=10;1
+font-4 = FontAwesome5Free:style=Regular:size=10;1
+font-5 = FontAwesome5Brands:style=Regular:size=10;1
+
+modules-right =  btc bth sound ram space wttr battery
+modules-left = time
+modules-center = i3
+
+tray-position = right
+tray-padding = 2
+
+;scroll-up = i3wm-wsnext
+;scroll-down = i3wm-wsprev
+
+cursor-click = pointer
+
+[module/time]
+type = custom/script
+background = #fff
+exec = date '+%d %h %H:%M'
+click-left = terminator -e "w3m cal" 
+label = "%output%"
+interval = 5
+
+[module/battery]
+type = custom/script
+exec = cat /sys/class/power_supply/BAT1/capacity
+interval = 5
+label = :%output%%
+
+[module/bth]
+type = custom/script
+exec = echo ""
+label = %output%
+click-left = sh ~/scripts/BlueToothConnect.sh
+click-right =  sh ~/scripts/BlueToothDisconnect.sh
+
+
+[module/sound]
+type = custom/ipc
+hook-0 = awk -F"[][]" '/Left:/ { print $2 }' <(amixer sget Master)
+scroll-up = amixer set Master 10%+; polybar-msg hook sound 1
+scroll-down = amixer set Master 10%-; polybar-msg hook sound 1
+format-prefix = ":  "
+initial = 1
+
+[module/wttr]
+type = custom/script
+exec = echo $(curl -s http://wttr.in/Resita\?format\=3) | grep "Resita" | awk '{print $3}'
+label = %output%
+interval = 60
+click-left = terminator -e "w3m wttr.in"  &
+format-prefix = ": "
+
+[module/space]
+type = custom/script
+exec = df -h | grep "nvm" | awk '{print $5}'
+label = %output%
+interval = 3600
+format-prefix = ": "
+
+[module/ram]
+type = custom/script
+exec = free -h | grep "Mem:" | awk '{print $7}'
+label = %output%
+format-prefix = ": " 
+
+interval = 60
+
+[module/btc]
+type = custom/script
+exec = curl -s http://api.coindesk.com/v1/bpi/currentprice.json | python -c "import json, sys; print(json.load(sys.stdin)['bpi']['USD']['rate'])"
+interval = 60
+format-prefix = "$: "
+
+[module/i3]
+type = internal/i3
+label-mode-padding = 5
+label-focused-foreground= ${colors.primary}
+label-seperator = "|"
